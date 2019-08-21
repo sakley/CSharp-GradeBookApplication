@@ -34,30 +34,39 @@ namespace GradeBook.UserInterfaces
         public static void CreateCommand(string command)
         {
             var parts = command.Split(' ');
-            if (parts.Length != 3)
+            if (parts.Length != 4)
             {
-                Console.WriteLine("Command not valid, Create requires a name and type of gradebook.");
+                Console.WriteLine("Command not valid, Create requires a name, type, and boolean for weighted of gradebook.");
                 return;
             }
             var name = parts[1];
             var type = parts[2];
+            var hasWeightParameter = Boolean.TryParse(parts[3], out bool weighted);
             BaseGradeBook gradeBook;
-
-            if (type == "standard")
+            if (hasWeightParameter)
             {
-                gradeBook = new StandardGradeBook(name);
+                if (type == "standard")
+                {
+                    gradeBook = new StandardGradeBook(name, weighted);
+                }
+                else if (type == "ranked")
+                {
+                    gradeBook = new RankedGradeBook(name, weighted);
+                }
+                else
+                {
+                    Console.WriteLine($"{type} is not a supported type of gradebook, please try again");
+                    return;
+                }
+                Console.WriteLine("Created gradebook {0}.", name);
+                GradeBookUserInterface.CommandLoop(gradeBook);
             }
-            else if (type == "ranked")
+            else
             {
-                gradeBook = new RankedGradeBook(name);
-            }
-            else 
-            {
-                Console.WriteLine($"{type} is not a supported type of gradebook, please try again");
+                Console.WriteLine("Command not valid. The last argument of the Create command needs to be a boolean (TRUE/FALSE)");
                 return;
             }
-            Console.WriteLine("Created gradebook {0}.", name);
-            GradeBookUserInterface.CommandLoop(gradeBook);
+
         }
                 
         
